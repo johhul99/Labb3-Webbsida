@@ -1,0 +1,112 @@
+﻿@page "/admin"
+@inject HttpClient Http
+@rendermode InteractiveServer
+
+@if(!isAuthenticated)
+{
+    <h3>Admin login</h3>
+    <input type="text" @bind="username" placeholder="Användarnamn" class="mb-1 form-control w-100" />
+    <br/>
+    <input type="password" @bind="password" placeholder="Lösenord" class="mb-2 form-control w-100" />
+    <br/>
+    <button @onclick="Login" class="btn btn-primary p-1">Logga in</button>
+}
+else 
+{
+    <h3>Lägg till teknologier</h3>
+    <input type="text" @bind="name" placeholder="Namn" class="mb-1 form-control w-100"/>
+    <br/>
+    <input type="number" @bind="yearsOfExperience" placeholder="Antal år erfarenhet" class="mb-1 form-control w-100" />
+    <br/>
+    <select @bind="skillLevel" class="form-select mb-2 w-100">
+        <option value="">Kunskapsnivå</option>
+        <option value="Beginner">Beginner</option>
+        <option value="Intermediate">Intermediate</option>
+        <option value="Advanced">Advanced</option>
+        <option value="Expert">Expert</option>
+    </select>
+    <br/>
+    <button @onclick="AddTechnology" class="btn btn-primary mb-4">Lägg till</button>
+    <br/>
+    @if (!string.IsNullOrEmpty(newTechAdded))
+    {
+        <p class="mb-4 text-white bg-success p-2 rounded">@newTechAdded</p>
+    }
+    @if(!string.IsNullOrEmpty(errorMessage)){
+        <p class="mb-4" text-white bg-danger p-2 rounded>@errorMessage</p>
+    }
+    <br/>
+    <button @onclick="Logout" class="btn btn-danger">Logga ut</button>
+}
+
+
+
+
+
+
+@code {
+    private string username = string.Empty;
+    private string password = string.Empty;
+    private bool isAuthenticated = false;
+
+    private string name = string.Empty;
+    private float yearsOfExperience = 0;
+    private string skillLevel = string.Empty;
+
+    private string newTechAdded = string.Empty;
+    private string errorMessage = string.Empty;
+
+    private async Task Login()
+    {
+        var loginData = new { Username = username, Password = password };
+        var response = await Http.PostAsJsonAsync("https://localhost:7011/login", loginData);
+
+        if(response.IsSuccessStatusCode)
+        {
+            isAuthenticated = true;
+        }
+        else{
+            Console.WriteLine("Felaktigt användarnamn eller lösenord.");
+        }
+    }
+
+    private async Task AddTechnology()
+    {
+        try{
+            var tech = new { Name = name, YearsOfExperience = yearsOfExperience, SkillLevel = skillLevel };
+            var response = await Http.PostAsJsonAsync("https://localhost:7210/technology", tech);
+
+            if (response.IsSuccessStatusCode)
+            {
+                newTechAdded = $"{tech.Name} tillagt på cv!";
+                StateHasChanged();
+            }
+            else
+            {
+                Console.WriteLine($"Gick ej att lägga till. Felkod: {response.StatusCode}");
+                errorMessage = $"Gick ej att lägga till. Felkod: {response.StatusCode}";
+                StateHasChanged();
+            }
+        }
+        catch(Exception ex){
+            Console.WriteLine(ex.Message);
+        }
+
+        name = string.Empty;
+        yearsOfExperience = 0;
+        skillLevel = string.Empty;
+
+        await Task.Delay(4000);
+
+        newTechAdded = string.Empty;
+        errorMessage = string.Empty;
+
+    }
+
+    private void Logout()
+     {
+        isAuthenticated = false;
+        username = string.Empty;
+        password = string.Empty;
+    }
+}

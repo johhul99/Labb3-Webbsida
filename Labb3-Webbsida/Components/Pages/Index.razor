@@ -1,0 +1,43 @@
+﻿@page "/"
+@inject HttpClient Http
+@rendermode InteractiveServer
+
+<PageTitle>Home</PageTitle>
+
+<ul>
+    @foreach (Technology technology in Technologies)
+    {
+        <li>@technology.Name <br/>
+            Erfarenhet: @technology.YearsOfExperience år <br/>
+            Kunskapsnivå: @technology.SkillLevel
+        </li>
+    }
+</ul>
+
+
+
+
+
+
+
+@code {
+    List<Technology> Technologies = new List<Technology>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTechnologies();
+    }
+
+    public async Task LoadTechnologies()
+    {
+        Technologies = await Http.GetFromJsonAsync<List<Technology>>("https://localhost:7210/technologies");
+    }
+
+    public class Technology
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public float YearsOfExperience { get; set; }
+        public string SkillLevel { get; set; }
+    }
+}
