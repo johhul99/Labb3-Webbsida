@@ -1,5 +1,8 @@
 ﻿@page "/admin"
+@using System.Text.Json
+@using System.Text.Json.Serialization
 @inject HttpClient Http
+@inject IJSRuntime JS
 @rendermode InteractiveServer
 
 @if(!isAuthenticated)
@@ -10,6 +13,10 @@
     <input type="password" @bind="password" placeholder="Lösenord" class="mb-2 form-control w-100" />
     <br/>
     <button @onclick="Login" class="btn btn-primary p-1">Logga in</button>
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <p class="mb-4" text-white bg-danger p-2 rounded>@errorMessage</p>
+    }
 }
 else 
 {
@@ -48,6 +55,7 @@ else
     private string username = string.Empty;
     private string password = string.Empty;
     private bool isAuthenticated = false;
+    private bool isRendered = false;
 
     private string name = string.Empty;
     private float yearsOfExperience = 0;
@@ -56,25 +64,68 @@ else
     private string newTechAdded = string.Empty;
     private string errorMessage = string.Empty;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            var token = await JS.InvokeAsync<string>("localStorage.getItem", "authToken");
+
+            if(!string.IsNullOrEmpty(token)){
+                isAuthenticated = true;
+                StateHasChanged();
+            }
+
+            isRendered = true;
+        }
+    }
+
     private async Task Login()
     {
+        errorMessage = string.Empty;
         var loginData = new { Username = username, Password = password };
         var response = await Http.PostAsJsonAsync("https://localhost:7011/login", loginData);
 
         if(response.IsSuccessStatusCode)
         {
-            isAuthenticated = true;
+            var json = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Rådata från API: {json}");
+            var token = JsonSerializer.Deserialize<JwtResponse>(json)?.Token;
+
+            if(!string.IsNullOrEmpty(token)) 
+            {
+                await JS.InvokeVoidAsync("localStorage.setItem", "authToken", token);
+                Console.WriteLine("🔍 Token sparad i localStorage.");
+                isAuthenticated = true;
+                StateHasChanged();
+            }      
         }
         else{
-            Console.WriteLine("Felaktigt användarnamn eller lösenord.");
+            errorMessage = "Felaktigt användarnamn eller lösenord.";
+
+            await ClearMessages();
         }
     }
 
     private async Task AddTechnology()
     {
         try{
+            var token = await JS.InvokeAsync<string>("localStorage.getItem", "authToken");
+
+            if(string.IsNullOrEmpty(token))
+            {
+                errorMessage = "Du måste vara inloggad.";
+                StateHasChanged();
+                return;
+            }
+
             var tech = new { Name = name, YearsOfExperience = yearsOfExperience, SkillLevel = skillLevel };
-            var response = await Http.PostAsJsonAsync("https://localhost:7210/technology", tech);
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7210/technology")
+            {
+                Content = JsonContent.Create(tech),
+                Headers = { {"Authorization", $"Bearer {token}"} }
+            };
+
+            var response = await Http.SendAsync(request); 
 
             if (response.IsSuccessStatusCode)
             {
@@ -83,30 +134,42 @@ else
             }
             else
             {
-                Console.WriteLine($"Gick ej att lägga till. Felkod: {response.StatusCode}");
                 errorMessage = $"Gick ej att lägga till. Felkod: {response.StatusCode}";
                 StateHasChanged();
             }
         }
         catch(Exception ex){
-            Console.WriteLine(ex.Message);
+            errorMessage = ex.Message;
         }
 
         name = string.Empty;
         yearsOfExperience = 0;
         skillLevel = string.Empty;
 
-        await Task.Delay(4000);
-
-        newTechAdded = string.Empty;
-        errorMessage = string.Empty;
+        await ClearMessages();
 
     }
 
-    private void Logout()
-     {
+    private async Task Logout()
+    {
+        await JS.InvokeVoidAsync("localStorage.removeItem", "authToken");
         isAuthenticated = false;
         username = string.Empty;
         password = string.Empty;
+    }
+
+    private async Task ClearMessages()
+    {
+        await Task.Delay(4000);
+        newTechAdded = string.Empty;
+        errorMessage = string.Empty;
+        await InvokeAsync(StateHasChanged);
+    }
+
+
+    private class JwtResponse
+    {
+        [JsonPropertyName("token")]
+        public string Token { get; set; }
     }
 }
