@@ -1,6 +1,7 @@
 ﻿@page "/admin"
 @using System.Text.Json
 @using System.Text.Json.Serialization
+@using System.ComponentModel.DataAnnotations
 @inject HttpClient Http
 @inject IJSRuntime JS
 @rendermode InteractiveServer
@@ -18,32 +19,57 @@
         <p class="mb-4" text-white bg-danger p-2 rounded>@errorMessage</p>
     }
 }
-else 
+else
 {
-    <h3>Lägg till teknologier</h3>
-    <input type="text" @bind="name" placeholder="Namn" class="mb-1 form-control w-100"/>
-    <br/>
-    <input type="number" @bind="yearsOfExperience" placeholder="Antal år erfarenhet" class="mb-1 form-control w-100" />
-    <br/>
-    <select @bind="skillLevel" class="form-select mb-2 w-100">
-        <option value="">Kunskapsnivå</option>
-        <option value="Beginner">Beginner</option>
-        <option value="Intermediate">Intermediate</option>
-        <option value="Advanced">Advanced</option>
-        <option value="Expert">Expert</option>
-    </select>
-    <br/>
-    <button @onclick="AddTechnology" class="btn btn-primary mb-4">Lägg till</button>
-    <br/>
-    @if (!string.IsNullOrEmpty(newTechAdded))
-    {
-        <p class="mb-4 text-white bg-success p-2 rounded">@newTechAdded</p>
-    }
-    @if(!string.IsNullOrEmpty(errorMessage)){
-        <p class="mb-4" text-white bg-danger p-2 rounded>@errorMessage</p>
-    }
-    <br/>
-    <button @onclick="Logout" class="btn btn-danger">Logga ut</button>
+    <AuthorizeView>
+        <Authorized>
+            <h3>Lägg till teknologier</h3>
+            <EditForm Model="@techModel" OnValidSubmit="@AddTechnology">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <input type="text" @bind="techModel.Name" placeholder="Namn" class="mb-1 form-control w-100"/>
+                <ValidationMessage For="@(() => techModel.Name)" />
+
+                <br/>
+
+                <input type="number" @bind="techModel.YearsOfExperience" placeholder="Antal år erfarenhet" class="mb-1 form-control w-100" />
+                <ValidationMessage For="@(() => techModel.YearsOfExperience)" />
+
+                <br/>
+
+                <select @bind="techModel.SkillLevel" class="form-select mb-2 w-100">
+                    <option value="">Kunskapsnivå</option>
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Expert">Expert</option>
+                </select>
+                <ValidationMessage For="@(() => techModel.SkillLevel)" />
+
+                <br/>
+
+                <button type="submit" class="btn btn-primary mb-4" disabled="@isSubmitting">
+                    @(isSubmitting ? "Lägger till..." : "Lägg till")
+                </button>
+            </EditForm>
+
+            @if (!string.IsNullOrEmpty(newTechAdded))
+            {
+                <p class="mb-4 text-white bg-success p-2 rounded">@newTechAdded</p>
+            }
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <p class="mb-4 text-white bg-danger p-2 rounded">@errorMessage</p>
+            }
+
+            <br/>
+            <button @onclick="Logout" class="btn btn-danger">Logga ut</button>
+        </Authorized>
+        <NotAuthorized>
+            <h3>Endast admin har åtkomst till denna sida</h3>
+        </NotAuthorized>
+    </AuthorizeView>
 }
 
 
@@ -56,13 +82,12 @@ else
     private string password = string.Empty;
     private bool isAuthenticated = false;
     private bool isRendered = false;
-
-    private string name = string.Empty;
-    private float yearsOfExperience = 0;
-    private string skillLevel = string.Empty;
+    private bool isSubmitting = false;
 
     private string newTechAdded = string.Empty;
     private string errorMessage = string.Empty;
+
+    private TechnologyModel techModel = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -106,56 +131,13 @@ else
         }
     }
 
-    private async Task AddTechnology()
-    {
-        try{
-            var token = await JS.InvokeAsync<string>("localStorage.getItem", "authToken");
-
-            if(string.IsNullOrEmpty(token))
-            {
-                errorMessage = "Du måste vara inloggad.";
-                StateHasChanged();
-                return;
-            }
-
-            var tech = new { Name = name, YearsOfExperience = yearsOfExperience, SkillLevel = skillLevel };
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7210/technology")
-            {
-                Content = JsonContent.Create(tech),
-                Headers = { {"Authorization", $"Bearer {token}"} }
-            };
-
-            var response = await Http.SendAsync(request); 
-
-            if (response.IsSuccessStatusCode)
-            {
-                newTechAdded = $"{tech.Name} tillagt på cv!";
-                StateHasChanged();
-            }
-            else
-            {
-                errorMessage = $"Gick ej att lägga till. Felkod: {response.StatusCode}";
-                StateHasChanged();
-            }
-        }
-        catch(Exception ex){
-            errorMessage = ex.Message;
-        }
-
-        name = string.Empty;
-        yearsOfExperience = 0;
-        skillLevel = string.Empty;
-
-        await ClearMessages();
-
-    }
-
     private async Task Logout()
     {
         await JS.InvokeVoidAsync("localStorage.removeItem", "authToken");
         isAuthenticated = false;
         username = string.Empty;
         password = string.Empty;
+        StateHasChanged();
     }
 
     private async Task ClearMessages()
@@ -166,10 +148,68 @@ else
         await InvokeAsync(StateHasChanged);
     }
 
+    private async Task AddTechnology()
+    {
+        if (isSubmitting) return;
+        isSubmitting = true;
+
+        try
+        {
+            var token = await JS.InvokeAsync<string>("localStorage.getItem", "authToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                errorMessage = "Du måste vara inloggad.";
+                StateHasChanged();
+                return;
+            }
+
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7210/technology")
+            {
+                Content = JsonContent.Create(techModel),
+                Headers = { { "Authorization", $"Bearer {token}" } }
+            };
+
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                newTechAdded = $"{techModel.Name} tillagt på CV!";
+            }
+            else
+            {
+                errorMessage = $"Gick ej att lägga till. Felkod: {response.StatusCode}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+
+        techModel = new();
+        await InvokeAsync(StateHasChanged);
+        await ClearMessages();
+    }
+
+
 
     private class JwtResponse
     {
         [JsonPropertyName("token")]
         public string Token { get; set; }
     }
+
+    public class TechnologyModel
+    {
+        [Required(ErrorMessage = "Namn är obligatoriskt.")]
+        [MinLength(2, ErrorMessage = "Namnet måste vara minst 2 tecken långt.")]
+        public string Name { get; set; } = string.Empty;
+
+        [Range(0, 50, ErrorMessage = "Erfarenhet måste vara mellan 0 och 50 år.")]
+        public float YearsOfExperience { get; set; }
+
+        [Required(ErrorMessage = "Välj en kunskapsnivå.")]
+        public string SkillLevel { get; set; } = string.Empty;
+    }
+
 }
