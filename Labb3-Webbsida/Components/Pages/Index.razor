@@ -162,6 +162,27 @@
     </div>
 </div>
 
+<hr />
+
+<div class="row">
+    <div class="col-12 text-center">
+        <div class="card p-3 mb-3">
+            <h4>Min GitHub-profil</h4>
+            @if (GitHubData != null && !string.IsNullOrEmpty(GitHubData.login))
+            {
+                <img src="@GitHubData.avatar_url" alt="GitHub avatar" class="rounded-circle" width="150">
+                <h3>@GitHubData.name (@GitHubData.login)</h3>
+                <p>Publika repositories: @GitHubData.public_repos</p>
+                <a href="@GitHubData.html_url" target="_blank" class="btn btn-primary">Besök min GitHub-profil</a>
+            }
+            else
+            {
+                <p>Laddar GitHub-profil...</p>
+            }
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -170,10 +191,12 @@
 
 @code {
     List<Technology> Technologies = new List<Technology>();
+    GitHubProfile GitHubData = new GitHubProfile();
 
     protected override async Task OnInitializedAsync()
     {
         await LoadTechnologies();
+        await LoadGitHubProfile();
     }
 
     public async Task LoadTechnologies()
@@ -181,11 +204,45 @@
         Technologies = await Http.GetFromJsonAsync<List<Technology>>("https://localhost:7210/technologies");
     }
 
+    public async Task LoadGitHubProfile()
+    {
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/users/johhul99");
+            request.Headers.Add("User-Agent", "BlazorApp");
+
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                GitHubData = await response.Content.ReadFromJsonAsync<GitHubProfile>();
+            }
+            else
+            {
+                Console.WriteLine($"GitHub API gav fel: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Kunde inte hämta GitHub-profil: {ex.Message}");
+        }
+    }
+
+
     public class Technology
     {
         public string Id { get; set; }
         public string Name { get; set; }
         public int YearsOfExperience { get; set; }
         public string SkillLevel { get; set; }
+    }
+
+    public class GitHubProfile
+    {
+        public string login { get; set; }
+        public string avatar_url { get; set; }
+        public string html_url { get; set; }
+        public string name { get; set; }
+        public int public_repos { get; set; }
     }
 }
