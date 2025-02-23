@@ -7,65 +7,82 @@
 @inject IJSRuntime JS
 @rendermode InteractiveServer
 
-@if(!isAuthenticated)
+@if (!isAuthenticated)
 {
-    <h3>Admin login</h3>
-    <input type="text" @bind="username" placeholder="Användarnamn" class="mb-1 form-control w-100" />
-    <br/>
-    <input type="password" @bind="password" placeholder="Lösenord" class="mb-2 form-control w-100" />
-    <br/>
-    <button @onclick="Login" class="btn btn-primary p-1">Logga in</button>
-    <br /><br />
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <p class="mb-4 text-white bg-danger p-2 rounded">@errorMessage</p>
-    }
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-4">
+                <div class="card p-4 shadow">
+                    <h3 class="text-center">Admin Login</h3>
+                    <input type="text" @bind="username" placeholder="Användarnamn" class="form-control mb-2" />
+                    <input type="password" @bind="password" placeholder="Lösenord" class="form-control mb-3" />
+                    <button @onclick="Login" class="btn btn-primary w-100" disabled="@isSubmitting">
+                        @(isSubmitting ? "Loggar in..." : "Logga in")
+                    </button>
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <p class="text-white bg-danger p-2 mt-3 rounded text-center">@errorMessage</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 }
 else
 {
-    <EditForm Model="@techModel" OnValidSubmit="@AddTechnology">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8">
+                <div class="card p-4 shadow">
+                    <h3 class="text-center">Lägg till Teknologi</h3>
 
-        <input type="text" @bind="techModel.Name" placeholder="Namn" class="mb-1 form-control w-100"/>
-        <ValidationMessage For="@(() => techModel.Name)" />
+                    <EditForm Model="@techModel" OnValidSubmit="@AddTechnology">
+                        <DataAnnotationsValidator />
+                        <div class="mb-3">
+                            <input type="text" @bind="techModel.Name" placeholder="Namn" class="form-control" />
+                            <ValidationMessage For="@(() => techModel.Name)" />
+                        </div>
 
-        <br />
+                        <div class="mb-3">
+                            <input type="number" @bind="techModel.YearsOfExperience" placeholder="Antal år erfarenhet" class="form-control" />
+                            <ValidationMessage For="@(() => techModel.YearsOfExperience)" />
+                        </div>
 
-        <input type="number" @bind="techModel.YearsOfExperience" placeholder="Antal år erfarenhet" class="mb-1 form-control w-100" />
-        <ValidationMessage For="@(() => techModel.YearsOfExperience)" />
+                        <div class="mb-3">
+                            <select @bind="techModel.SkillLevel" class="form-select">
+                                <option value="">Kunskapsnivå</option>
+                                <option value="Beginner">Beginner</option>
+                                <option value="Intermediate">Intermediate</option>
+                                <option value="Advanced">Advanced</option>
+                                <option value="Expert">Expert</option>
+                            </select>
+                            <ValidationMessage For="@(() => techModel.SkillLevel)" />
+                        </div>
 
-        <br />
+                        <button type="submit" class="btn btn-primary w-100" disabled="@isSubmitting">
+                            @(isSubmitting ? "Lägger till..." : "Lägg till")
+                        </button>
+                    </EditForm>
 
-        <select @bind="techModel.SkillLevel" class="form-select mb-2 w-100">
-            <option value="">Kunskapsnivå</option>
-            <option value="Beginner">Beginner</option>
-            <option value="Intermediate">Intermediate</option>
-            <option value="Advanced">Advanced</option>
-            <option value="Expert">Expert</option>
-        </select>
-        <ValidationMessage For="@(() => techModel.SkillLevel)" />
+                    @if (!string.IsNullOrEmpty(newTechAdded))
+                    {
+                        <p class="text-white bg-success p-2 mt-3 rounded text-center">@newTechAdded</p>
+                    }
 
-        <br />
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <p class="text-white bg-danger p-2 mt-3 rounded text-center">@errorMessage</p>
+                    }
+                </div>
+            </div>
+        </div>
 
-        <button type="submit" class="btn btn-primary mb-4" disabled="@isSubmitting">
-            @(isSubmitting ? "Lägger till..." : "Lägg till")
-        </button>
-    </EditForm>
-
-    @if (!string.IsNullOrEmpty(newTechAdded))
-    {
-        <p class="mb-4 text-white bg-success p-2 rounded">@newTechAdded</p>
-    }
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <p class="mb-4 text-white bg-danger p-2 rounded">@errorMessage</p>
-    }
-
-    <br />
-    <button @onclick="Logout" class="btn btn-danger">Logga ut</button>           
+        <div class="text-center mt-4">
+            <button @onclick="Logout" class="btn btn-danger">Logga ut</button>
+        </div>
+    </div>
 }
-
 
 
 
@@ -215,7 +232,7 @@ else
         [MinLength(2, ErrorMessage = "Namnet måste vara minst 2 tecken långt.")]
         public string Name { get; set; } = string.Empty;
 
-        [Range(0, 50, ErrorMessage = "Erfarenhet måste vara mellan 0 och 50 år.")]
+        [Range(1, 50, ErrorMessage = "Erfarenhet måste vara mellan 1 och 50 år.")]
         public int YearsOfExperience { get; set; }
 
         [Required(ErrorMessage = "Välj en kunskapsnivå.")]
