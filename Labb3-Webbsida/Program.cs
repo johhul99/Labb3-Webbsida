@@ -1,5 +1,6 @@
 using Labb3_Webbsida.Components;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 

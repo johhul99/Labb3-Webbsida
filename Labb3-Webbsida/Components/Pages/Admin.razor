@@ -2,6 +2,7 @@
 @using System.Text.Json
 @using System.Text.Json.Serialization
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Authorization
 @inject HttpClient Http
 @inject IJSRuntime JS
 @rendermode InteractiveServer
@@ -14,62 +15,55 @@
     <input type="password" @bind="password" placeholder="Lösenord" class="mb-2 form-control w-100" />
     <br/>
     <button @onclick="Login" class="btn btn-primary p-1">Logga in</button>
+    <br /><br />
     @if (!string.IsNullOrEmpty(errorMessage))
     {
-        <p class="mb-4" text-white bg-danger p-2 rounded>@errorMessage</p>
+        <p class="mb-4 text-white bg-danger p-2 rounded">@errorMessage</p>
     }
 }
 else
 {
-    <AuthorizeView>
-        <Authorized>
-            <h3>Lägg till teknologier</h3>
-            <EditForm Model="@techModel" OnValidSubmit="@AddTechnology">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
+    <EditForm Model="@techModel" OnValidSubmit="@AddTechnology">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-                <input type="text" @bind="techModel.Name" placeholder="Namn" class="mb-1 form-control w-100"/>
-                <ValidationMessage For="@(() => techModel.Name)" />
+        <input type="text" @bind="techModel.Name" placeholder="Namn" class="mb-1 form-control w-100"/>
+        <ValidationMessage For="@(() => techModel.Name)" />
 
-                <br/>
+        <br />
 
-                <input type="number" @bind="techModel.YearsOfExperience" placeholder="Antal år erfarenhet" class="mb-1 form-control w-100" />
-                <ValidationMessage For="@(() => techModel.YearsOfExperience)" />
+        <input type="number" @bind="techModel.YearsOfExperience" placeholder="Antal år erfarenhet" class="mb-1 form-control w-100" />
+        <ValidationMessage For="@(() => techModel.YearsOfExperience)" />
 
-                <br/>
+        <br />
 
-                <select @bind="techModel.SkillLevel" class="form-select mb-2 w-100">
-                    <option value="">Kunskapsnivå</option>
-                    <option value="Beginner">Beginner</option>
-                    <option value="Intermediate">Intermediate</option>
-                    <option value="Advanced">Advanced</option>
-                    <option value="Expert">Expert</option>
-                </select>
-                <ValidationMessage For="@(() => techModel.SkillLevel)" />
+        <select @bind="techModel.SkillLevel" class="form-select mb-2 w-100">
+            <option value="">Kunskapsnivå</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+            <option value="Expert">Expert</option>
+        </select>
+        <ValidationMessage For="@(() => techModel.SkillLevel)" />
 
-                <br/>
+        <br />
 
-                <button type="submit" class="btn btn-primary mb-4" disabled="@isSubmitting">
-                    @(isSubmitting ? "Lägger till..." : "Lägg till")
-                </button>
-            </EditForm>
+        <button type="submit" class="btn btn-primary mb-4" disabled="@isSubmitting">
+            @(isSubmitting ? "Lägger till..." : "Lägg till")
+        </button>
+    </EditForm>
 
-            @if (!string.IsNullOrEmpty(newTechAdded))
-            {
-                <p class="mb-4 text-white bg-success p-2 rounded">@newTechAdded</p>
-            }
-            @if (!string.IsNullOrEmpty(errorMessage))
-            {
-                <p class="mb-4 text-white bg-danger p-2 rounded">@errorMessage</p>
-            }
+    @if (!string.IsNullOrEmpty(newTechAdded))
+    {
+        <p class="mb-4 text-white bg-success p-2 rounded">@newTechAdded</p>
+    }
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <p class="mb-4 text-white bg-danger p-2 rounded">@errorMessage</p>
+    }
 
-            <br/>
-            <button @onclick="Logout" class="btn btn-danger">Logga ut</button>
-        </Authorized>
-        <NotAuthorized>
-            <h3>Endast admin har åtkomst till denna sida</h3>
-        </NotAuthorized>
-    </AuthorizeView>
+    <br />
+    <button @onclick="Logout" class="btn btn-danger">Logga ut</button>           
 }
 
 
@@ -81,7 +75,6 @@ else
     private string username = string.Empty;
     private string password = string.Empty;
     private bool isAuthenticated = false;
-    private bool isRendered = false;
     private bool isSubmitting = false;
 
     private string newTechAdded = string.Empty;
@@ -91,16 +84,22 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(firstRender)
+        try
         {
-            var token = await JS.InvokeAsync<string>("localStorage.getItem", "authToken");
+            if (firstRender)
+            {
+                var token = await JS.InvokeAsync<string>("localStorage.getItem", "authToken");
 
-            if(!string.IsNullOrEmpty(token)){
-                isAuthenticated = true;
-                StateHasChanged();
+                if (!string.IsNullOrEmpty(token))
+                {
+                    isAuthenticated = true;
+                    StateHasChanged();
+                }
             }
-
-            isRendered = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ Fel i OnAfterRenderAsync: {ex.Message}");
         }
     }
 
@@ -108,28 +107,37 @@ else
     {
         errorMessage = string.Empty;
         var loginData = new { Username = username, Password = password };
-        var response = await Http.PostAsJsonAsync("https://localhost:7011/login", loginData);
 
-        if(response.IsSuccessStatusCode)
+        try
         {
-            var json = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Rådata från API: {json}");
-            var token = JsonSerializer.Deserialize<JwtResponse>(json)?.Token;
+            var response = await Http.PostAsJsonAsync("https://localhost:7011/login", loginData);
 
-            if(!string.IsNullOrEmpty(token)) 
+            if (response.IsSuccessStatusCode)
             {
-                await JS.InvokeVoidAsync("localStorage.setItem", "authToken", token);
-                Console.WriteLine("🔍 Token sparad i localStorage.");
-                isAuthenticated = true;
-                StateHasChanged();
-            }      
-        }
-        else{
-            errorMessage = "Felaktigt användarnamn eller lösenord.";
+                var json = await response.Content.ReadAsStringAsync();
+                var token = JsonSerializer.Deserialize<JwtResponse>(json)?.Token;
 
-            await ClearMessages();
+                if (!string.IsNullOrEmpty(token))
+                {
+                    await JS.InvokeVoidAsync("localStorage.setItem", "authToken", token);
+                    isAuthenticated = true;
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+            else
+            {
+                errorMessage = "Felaktigt användarnamn eller lösenord.";
+                await InvokeAsync(StateHasChanged);
+                await ClearMessages();
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Fel vid inloggning: {ex.Message}";
+            await InvokeAsync(StateHasChanged);
         }
     }
+
 
     private async Task Logout()
     {
@@ -139,6 +147,7 @@ else
         password = string.Empty;
         StateHasChanged();
     }
+
 
     private async Task ClearMessages()
     {
@@ -186,6 +195,7 @@ else
             errorMessage = ex.Message;
         }
 
+        isSubmitting = false;
         techModel = new();
         await InvokeAsync(StateHasChanged);
         await ClearMessages();
@@ -206,7 +216,7 @@ else
         public string Name { get; set; } = string.Empty;
 
         [Range(0, 50, ErrorMessage = "Erfarenhet måste vara mellan 0 och 50 år.")]
-        public float YearsOfExperience { get; set; }
+        public int YearsOfExperience { get; set; }
 
         [Required(ErrorMessage = "Välj en kunskapsnivå.")]
         public string SkillLevel { get; set; } = string.Empty;
