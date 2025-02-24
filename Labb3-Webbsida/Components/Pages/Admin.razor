@@ -123,11 +123,12 @@ else
     private async Task Login()
     {
         errorMessage = string.Empty;
+        isSubmitting = true;
         var loginData = new { Username = username, Password = password };
 
         try
         {
-            var response = await Http.PostAsJsonAsync("http://localhost:7011/login", loginData);
+            var response = await Http.PostAsJsonAsync("https://labb3-identityapi.azurewebsites.net/login", loginData);
 
             if (response.IsSuccessStatusCode)
             {
@@ -153,6 +154,8 @@ else
             errorMessage = $"Fel vid inloggning: {ex.Message}";
             await InvokeAsync(StateHasChanged);
         }
+
+        isSubmitting = false;
     }
 
 
@@ -190,7 +193,7 @@ else
                 return;
             }
 
-            var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:7210/technology")
+            var request = new HttpRequestMessage(HttpMethod.Post, "https://labb3-techapi.azurewebsites.net/technology")
             {
                 Content = JsonContent.Create(techModel),
                 Headers = { { "Authorization", $"Bearer {token}" } }

@@ -205,7 +205,7 @@
 
     public async Task LoadTechnologies()
     {
-        Technologies = await Http.GetFromJsonAsync<List<Technology>>("http://localhost:7210/technologies");
+        Technologies = await Http.GetFromJsonAsync<List<Technology>>("https://labb3-techapi.azurewebsites.net/technologies");
     }
 
     public async Task LoadGitHubProfile()
