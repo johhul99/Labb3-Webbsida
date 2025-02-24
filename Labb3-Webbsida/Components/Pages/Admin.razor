@@ -127,7 +127,7 @@ else
 
         try
         {
-            var response = await Http.PostAsJsonAsync("https://localhost:7011/login", loginData);
+            var response = await Http.PostAsJsonAsync("http://localhost:7011/login", loginData);
 
             if (response.IsSuccessStatusCode)
             {
@@ -190,7 +190,7 @@ else
                 return;
             }
 
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:7210/technology")
+            var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:7210/technology")
             {
                 Content = JsonContent.Create(techModel),
                 Headers = { { "Authorization", $"Bearer {token}" } }

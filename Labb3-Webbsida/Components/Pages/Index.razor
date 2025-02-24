@@ -41,63 +41,57 @@
     <div class="col-12 col-md-6 text-start">
         <div class="card p-3 mb-3">
             <h4>Projekt</h4>
-            <ul class="list-group"> 
-                <li class="list-group-item">
-                    <strong>API display</strong>
-                    <p>
-                        Ett .NET API kopplat mot en databas, 
-                        ett Node API som get:ar innehållet av databasen från .NET API och displayar i en enkel frontend.
-                        <br /><br />
-                        Teknik som använts i projektet: Javascript, Node, HTML & CSS, Bootstrap, Microsoft Azure, Mongo DB, .NET, REST API
-                    </p>
-                </li>
-                <li class="list-group-item">
-                    <strong>Webbshop Fullstack</strong>
-                    <p>
-                        En webbsida innehållande information om ett fiktivt företag samt deras shop. 
-                        Shopen är kopplad till ett API som lagrar ordrar i en databas. 
-                        API:et har en enkel frontend för att tillåta de fiktiva medarbetarna att hantera beställningarna.
-                        <br /><br />
-                        Teknik som använts i projektet: Javascript, HTML & CSS, Bootstrap, Microsoft Azure, Mongo DB, .NET, REST API
-                    </p>
-                </li>
-                <li class="list-group-item">
-                    <strong>WPF Lagerhantering Bokhandel</strong>
-                    <p>
-                        WPF applikation som tillåter användaren att hantera en databas för en bokhandel med flera butiker.
-                        Användaren kan; se en lista på befintliga butiker,se vald butiks lagersaldo,
-                        ta bort och lägga till böcker från vald butiks lagersaldo,
-                        ta bort och lägga till författare och titlar ur bokhandelns sortiment.
-                        <br /><br />
-                        Teknik som använts i projektet: .NET, Microsoft Azure, SQL
-                    </p>
-                </li>
-                <li class="list-group-item">
-                    <strong>WPF MVVM Beställningsportal</strong>
-                    <p>
-                        WPF applikation som tillåter användaren att; <br />
-                        - skapa och makulera beställningar för kunder, <br />
-                        - skapa och ta bort kunder, <br />
-                        - se en lista på alla produkter, <br />
-                        - befintliga kunder och befintliga kunders lagda beställningar. <br />
-                        Kunder går att filtrera på namn, telefonnummer och kundnummer.
-                        <br /> <br />
-                        Teknik som använts i projektet: .NET
-                    </p>
-                </li>
-                <li class="list-group-item">
-                    <strong>Console Application Butik</strong>
-                    <p>
-                        En konsollapplikation där användaren kan registrera sig och logga in för att handla i 3 olika valutor. 
-                        Kundvagn sparas för varje användare och produkterna är kopplade mot en databas. 
-                        Applikationen har även tillgång till att lägga till samt ta bort produkter ur databasen.
-                        <br /> <br />
-                        Teknik som använts i projektet: .NET
-                    </p>
-                </li>
-            </ul>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Namn</th>
+                        <th>Beskrivning</th>
+                        <th>Tech Stack</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>API Display</strong></td>
+                        <td>
+                            Ett .NET API kopplat mot en databas,
+                            ett Node API som hämtar innehållet av databasen från .NET API och displayar i en enkel frontend.
+                        </td>
+                        <td>Javascript, Node, HTML & CSS, Bootstrap, Microsoft Azure, MongoDB, .NET, REST API</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Webbshop Fullstack</strong></td>
+                        <td>
+                            En webbsida innehållande information om ett fiktivt företag och deras shop, kopplad till ett API som hanterar beställningar.
+                        </td>
+                        <td>Javascript, HTML & CSS, Bootstrap, Microsoft Azure, MongoDB, .NET, REST API</td>
+                    </tr>
+                    <tr>
+                        <td><strong>WPF Lagerhantering Bokhandel</strong></td>
+                        <td>
+                            WPF-applikation för hantering av bokhandelns lager, med möjlighet att hantera böcker, författare och butiker.
+                        </td>
+                        <td>.NET, Microsoft Azure, SQL</td>
+                    </tr>
+                    <tr>
+                        <td><strong>WPF MVVM Beställningsportal</strong></td>
+                        <td>
+                            WPF-applikation för hantering av kundbeställningar, kunder och produkter, med filtreringsfunktion.
+                        </td>
+                        <td>.NET</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Console Application Butik</strong></td>
+                        <td>
+                            Konsolapplikation där användaren kan registrera sig, logga in och handla i olika valutor, spara sin kundvagn mellan körningar, kopplad till en databas.
+                        </td>
+                        <td>.NET, SQL</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
+
 
     <div class="col-12 col-md-6 text-start">
         <div class="card p-3 mb-3">
@@ -108,19 +102,29 @@
             }
             else
             {
-                <ul class="list-group">
-                    @foreach (var technology in Technologies)
-                    {
-                        <li class="list-group-item">
-                            <strong>@technology.Name</strong><br />
-                            Erfarenhet: @technology.YearsOfExperience år<br />
-                            Kunskapsnivå: @technology.SkillLevel
-                        </li>
-                    }
-                </ul>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Namn</th>
+                            <th>Erfarenhet (år)</th>
+                            <th>Kunskapsnivå</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var technology in Technologies)
+                        {
+                            <tr>
+                                <td>@technology.Name</td>
+                                <td>@technology.YearsOfExperience</td>
+                                <td>@technology.SkillLevel</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             }
         </div>
     </div>
+
 </div>
 
 <div class="row">
@@ -201,7 +205,7 @@
 
     public async Task LoadTechnologies()
     {
-        Technologies = await Http.GetFromJsonAsync<List<Technology>>("https://localhost:7210/technologies");
+        Technologies = await Http.GetFromJsonAsync<List<Technology>>("http://localhost:7210/technologies");
     }
 
     public async Task LoadGitHubProfile()
