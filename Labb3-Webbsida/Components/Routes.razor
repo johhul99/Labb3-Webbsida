@@ -1,4 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject IJSRuntime JS
+
+<HeadContent>
+    <meta name="blazor-navigation-locking" content="false" />
+    <script src="js/unload-fix.js"></script>
+</HeadContent>
 
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly">
@@ -13,3 +19,12 @@
 </CascadingAuthenticationState>
 
 
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("preventBlazorUnload");
+        }
+    }
+}
