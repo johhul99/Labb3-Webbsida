@@ -27,3 +27,22 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+html, body {
+    overflow-x: hidden;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+th, td {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
