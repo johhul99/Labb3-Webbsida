@@ -47,8 +47,8 @@ th, td {
 }
 
 .table td, .table th {
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+    word-break: keep-all;
+    white-space: nowrap;
 }
 
 .table-responsive {
