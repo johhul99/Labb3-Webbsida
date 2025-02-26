@@ -46,3 +46,12 @@ th, td {
     overflow-wrap: break-word;
 }
 
+.table td, .table th {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
