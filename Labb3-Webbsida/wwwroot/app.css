@@ -34,7 +34,10 @@ html, body {
 
 .table-responsive {
     overflow-x: auto;
+    white-space: nowrap;
+    max-width: 100%;
 }
+
 
 table {
     width: 100%;
@@ -51,7 +54,4 @@ th, td {
     overflow-wrap: break-word;
 }
 
-.table-responsive {
-    overflow-x: auto;
-}
 
