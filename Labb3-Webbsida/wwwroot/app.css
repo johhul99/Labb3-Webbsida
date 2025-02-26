@@ -28,15 +28,15 @@ h1:focus {
     border-color: #929292;
 }
 
-html, body {
-    overflow-x: hidden;
-}
-
 .table-responsive {
     overflow-x: auto;
     max-width: 100%;
+    -webkit-overflow-scrolling: touch;
 }
 
+html, body {
+    overflow-x: hidden;
+}
 
 table {
     width: max-content;
@@ -50,8 +50,9 @@ th, td {
 }
 
 .table td, .table th {
-    white-space: normal; 
-    word-break: break-word; 
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: normal;
 }
 
 

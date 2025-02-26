@@ -46,9 +46,9 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th style="width: 32%;">Namn</th>
-                            <th style="width: 42%;">Beskrivning</th>
-                            <th style="width: auto;">Tech Stack</th>
+                            <th>Namn</th>
+                            <th>Beskrivning</th>
+                            <th>Tech Stack</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,35 +58,71 @@
                                 Ett .NET API kopplat mot en databas,
                                 ett Node API som hämtar innehållet av databasen från .NET API och displayar i en enkel frontend.
                             </td>
-                            <td>Javascript, Node, HTML & CSS, Bootstrap, Microsoft Azure, MongoDB, .NET, REST API</td>
+                            <td>
+                                <ul>
+                                    <li>Javascript</li>
+                                    <li>Node</li>
+                                    <li>HTML & CSS</li>
+                                    <li>Bootstrap</li>
+                                    <li>Microsoft Azure</li>
+                                    <li>MongoDB</li>
+                                    <li>.NET</li>
+                                    <li>REST API</li>
+                                </ul>
+                            </td>
                         </tr>
                         <tr>
                             <td><strong>Webbshop Fullstack</strong></td>
                             <td>
                                 En webbsida innehållande information om ett fiktivt företag och deras shop, kopplad till ett API som hanterar beställningar.
                             </td>
-                            <td>Javascript, HTML & CSS, Bootstrap, Microsoft Azure, MongoDB, .NET, REST API</td>
+                            <td>
+                                <ul>
+                                    <li>Javascript</li>
+                                    <li>Node</li>
+                                    <li>HTML & CSS</li>
+                                    <li>Bootstrap</li>
+                                    <li>Microsoft Azure</li>
+                                    <li>MongoDB</li>
+                                    <li>REST API</li>
+                                </ul>
+                            </td>
                         </tr>
                         <tr>
                             <td><strong>WPF Lager Bokhandel</strong></td>
                             <td>
                                 WPF-applikation för hantering av bokhandelns lager, med möjlighet att hantera böcker, författare och butiker.
                             </td>
-                            <td>.NET, Microsoft Azure, SQL</td>
+                            <td>
+                                <ul>
+                                    <li>.NET</li>
+                                    <li>Microsoft Azure</li>
+                                    <li>SQL</li>
+                                </ul>
+                            </td>
                         </tr>
                         <tr>
                             <td><strong>WPF MVVM Orderportal</strong></td>
                             <td>
                                 WPF-applikation för hantering av ordrar, kunder och produkter, med filtreringsfunktion.
                             </td>
-                            <td>.NET</td>
+                            <td>
+                                <ul>
+                                    <li>.NET</li>
+                                </ul>
+                            </td>
                         </tr>
                         <tr>
                             <td><strong>Console Application Butik</strong></td>
                             <td>
                                 Konsolapplikation där användaren kan registrera sig, logga in och handla i olika valutor, spara sin kundvagn mellan körningar, kopplad till en databas.
                             </td>
-                            <td>.NET, SQL</td>
+                            <td>
+                                <ul>
+                                    <li>.NET</li>
+                                    <li>SQL</li>
+                                </ul>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -104,29 +140,30 @@
             }
             else
             {
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th style="width: 30%;">Namn</th>
-                            <th style="width: 30%;">Erfarenhet (år)</th>
-                            <th style="width: 40%;">Kunskapsnivå</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var technology in Technologies)
-                        {
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
                             <tr>
-                                <td>@technology.Name</td>
-                                <td>@technology.YearsOfExperience</td>
-                                <td>@technology.SkillLevel</td>
+                                <th>Namn</th>
+                                <th>Erfarenhet(år)</th>
+                                <th>Kunskapsnivå</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var technology in Technologies)
+                            {
+                                <tr>
+                                    <td>@technology.Name</td>
+                                    <td>@technology.YearsOfExperience</td>
+                                    <td>@technology.SkillLevel</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             }
         </div>
     </div>
-
 </div>
 
 <div class="row">
@@ -154,15 +191,15 @@
         <div class="card p-3 mb-3">
             <h4>Arbetslivserfarenhet</h4>
             <ul class="list-group">
-                <li class="list-group-item"><strong>Säljare</strong>, Smarteyes, Synoptik Sweden AB, Göteborg (Feb 2024 - Aug 2024)</li>
-                <li class="list-group-item"><strong>Ambulerande konsult, lager</strong>, Pokayoke AB, Göteborg (Aug 2023 - Feb 2024)</li>
-                <li class="list-group-item"><strong>Entrévärd</strong>, Balambaras - Cocktailbar, Lounge & Nightclub (Maj 2022 - Juli 2023)</li>
-                <li class="list-group-item"><strong>Säljare</strong>, Increment Security Group Gothia AB (Jan 2021 - Apr 2022)</li>
-                <li class="list-group-item"><strong>Teamleader & Säljare</strong>, Abonnemangsbutiken, Göteborg (Aug 2020 - Dec 2020)</li>
-                <li class="list-group-item"><strong>Egen Verksamhet</strong>, Actual High End, Göteborg (Aug 2019 - Aug 2020)</li>
-                <li class="list-group-item"><strong>Teamleader & Säljare</strong>, MobileGroup Nordic AB, Göteborg (Aug 2018 - Sep 2019)</li>
-                <li class="list-group-item"><strong>Låneförmedlare</strong>, Enklare Ekonomi Sverige AB, Göteborg (Maj 2018 - Aug 2018)</li>
-                <li class="list-group-item"><strong>Medarbetare</strong>, McDonald's, Partille (Okt 2016 - Aug 2017)</li>
+                <li class="list-group-item"><strong>Säljare</strong>,<br /> Smarteyes, Synoptik Sweden AB, <br /> Göteborg (Feb 2024 - Aug 2024)</li>
+                <li class="list-group-item"><strong>Ambulerande konsult, lager</strong>, <br />Pokayoke AB, <br />Göteborg (Aug 2023 - Feb 2024)</li>
+                <li class="list-group-item"><strong>Entrévärd</strong>, <br />Balambaras - Cocktailbar, Lounge & Nightclub, <br />Göteborg (Maj 2022 - Juli 2023)</li>
+                <li class="list-group-item"><strong>Säljare</strong>, <br /> Increment Security Group Gothia AB, <br />Göteborg (Jan 2021 - Apr 2022)</li>
+                <li class="list-group-item"><strong>Teamleader & Säljare</strong>, <br /> Abonnemangsbutiken, <br />Göteborg (Aug 2020 - Dec 2020)</li>
+                <li class="list-group-item"><strong>Egen Verksamhet</strong>, <br />Actual High End, <br />Göteborg (Aug 2019 - Aug 2020)</li>
+                <li class="list-group-item"><strong>Teamleader & Säljare</strong>, <br />MobileGroup Nordic AB, <br />Göteborg (Aug 2018 - Sep 2019)</li>
+                <li class="list-group-item"><strong>Låneförmedlare</strong>, <br />Enklare Ekonomi Sverige AB, <br />Göteborg (Maj 2018 - Aug 2018)</li>
+                <li class="list-group-item"><strong>Medarbetare</strong>, <br />McDonald's, <br />Partille (Okt 2016 - Aug 2017)</li>
             </ul>
         </div>
     </div>
