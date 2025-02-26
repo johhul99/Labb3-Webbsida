@@ -34,14 +34,14 @@ html, body {
 
 .table-responsive {
     overflow-x: auto;
-    white-space: nowrap;
     max-width: 100%;
 }
 
 
 table {
-    width: 100%;
-    table-layout: fixed;
+    width: max-content;
+    min-width: 100%;
+    table-layout: auto;
 }
 
 th, td {
@@ -50,8 +50,8 @@ th, td {
 }
 
 .table td, .table th {
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+    white-space: normal; 
+    word-break: break-word; 
 }
 
 
