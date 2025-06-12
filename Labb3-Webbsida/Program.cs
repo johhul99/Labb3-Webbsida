@@ -63,6 +63,8 @@ namespace Labb3_Webbsida
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
 
+            app.Urls.Add("http://0.0.0.0:5050");
+
             app.Run();
         }
     }

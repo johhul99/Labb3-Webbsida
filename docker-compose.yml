@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - labb3-net
+
+  labb3-api:
+    build:
+      context: ../Labb3-API/Labb3-API
+      dockerfile: Dockerfile
+    container_name: labb3-api
+    depends_on:
+      - mongodb
+    ports:
+      - "5050:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - labb3-net
+
+  labb3-webbsida:
+    build:
+      context: ./Labb3-Webbsida
+      dockerfile: Dockerfile
+    container_name: labb3-webbsida
+    depends_on:
+      - labb3-api
+    ports:
+      - "8080:5050"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - labb3-net
+
+volumes:
+  mongodb_data:
+
+networks:
+  labb3-net:

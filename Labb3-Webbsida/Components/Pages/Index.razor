@@ -238,13 +238,25 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadTechnologies();
-        await LoadGitHubProfile();
+        try{
+            await LoadTechnologies();
+            await LoadGitHubProfile();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fel vid initialisering: {ex.Message}");
+        }
     }
 
     public async Task LoadTechnologies()
     {
-        Technologies = await Http.GetFromJsonAsync<List<Technology>>("https://labb3-techapi.azurewebsites.net/technologies");
+        try{
+            Technologies = await Http.GetFromJsonAsync<List<Technology>>("http://host.docker.internal:5050/technologies");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Kunde inte hämta teknologier: {ex.Message}");
+        }
     }
 
     public async Task LoadGitHubProfile()
